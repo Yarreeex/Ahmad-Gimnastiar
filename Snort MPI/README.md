@@ -1,33 +1,61 @@
-# Ahmad-Gimnastiar - 09011282126050
-## Ubuntu Web Server
+## 1. Update Sistem
+    sudo apt update
+    sudo apt upgrade
 
-1. Install Ubuntu Server pada Virtualbox
+## 2. Install Depedencies
+    sudo apt install -y build-essential libpcap-dev libpcre3-dev libdumbnet-dev bison flex zlib1g-dev
 
-![image](https://github.com/Yarreeex/Ahmad-Gimnastiar/assets/104670362/5d50c0b3-0d40-44ac-9071-06f5334927ff)
+## 3. Download DAQ, Ekstrak, dan Install
+    wget https://www.snort.org/downloads/snort/daq-2.0.7.tar.gz
+    tar -xvzf daq-2.0.7.tar.gz
+    cd daq-2.0.7
+    ./configure
+    make
+    sudo make install
 
-2. Jalankan dan lakukan perintah ifconfig
+## 4. Download Snort (Manual)
+    wget https://www.snort.org/downloads/snort/snort-2.9.20.tar.gz
 
-![image](https://github.com/Yarreeex/Ahmad-Gimnastiar/assets/104670362/a9497864-b3c9-4cd8-bbd8-4b30573c366b)
+## 5. Ekstrak Snort
+    tar -xvzf snort-2.9.20.tar.gz
 
-3. Connect Ubuntu Server dengan Putty SSH Server
+#### Tambahan Instalasi
+    wget http://luajit.org/download/LuaJIT-2.0.5.tar.gz
+    tar -xvzf LuaJIT-2.0.5.tar.gz
+    cd LuaJIT-2.0.5
+    make
+    sudo make install
 
-![image](https://github.com/Yarreeex/Ahmad-Gimnastiar/assets/104670362/c9b8dae2-096c-4eac-b9a2-01aace842eec)
+## 6. Install Snort
+    cd snort-2.9.20
+    ./configure --enable-sourcefire
+    make
+    sudo make install
 
-4. Install dan konfigurasi wordpress, mysql, dan apache2 pada Putty.
+#### Instalasi Snort (Auto)
+    sudo apt-get install snort
 
-![image](https://github.com/Yarreeex/Ahmad-Gimnastiar/assets/104670362/4d7bbdd0-6cde-445a-93cb-fda3ebcdad28)
-  
-##
-  
-# Tampilan Dashboard Wordpress
-![image](https://github.com/Yarreeex/Ahmad-Gimnastiar/assets/104670362/c776ebc2-70b7-48d8-b5f0-8ac6283cbb85)
+#### Cek instalasi Snort
+    snort -V
 
-# Upload HTML ke Wordpress
-![image](https://github.com/Yarreeex/Ahmad-Gimnastiar/assets/104670362/5b32fd36-cb84-44d6-a1c6-466736361ef9)
+## 7. Konfigurasi Snort
+    sudo nano /etc/snort/snort.conf
 
-# Tampilan Homepage Wordpress
-![image](https://github.com/Yarreeex/Ahmad-Gimnastiar/assets/104670362/781bb5e4-eb55-484d-a5a1-504c6be338f6)
-![image](https://github.com/Yarreeex/Ahmad-Gimnastiar/assets/104670362/50135668-d473-4022-a11f-e9d930a447e9)
-![image](https://github.com/Yarreeex/Ahmad-Gimnastiar/assets/104670362/b167064a-96f6-42cc-a445-abe8f699b653)
-![image](https://github.com/Yarreeex/Ahmad-Gimnastiar/assets/104670362/124f303e-cf72-4dff-8e72-8bac14de73e2)
-![image](https://github.com/Yarreeex/Ahmad-Gimnastiar/assets/104670362/eda55c93-9738-485c-8738-87f44e576700)
+#### Konfigurasi yang dipakai
+    var HOME_NET 192.168.1.0/24
+
+## 8. Config Rules
+    alert icmp any any -> any any (msg:"ICMP Echo Request Detected"; itype:8; sid:1000001; rev:1;)
+#### Keterangan
+###### msg: Pesan yang muncul di log ketika rule ini terpicu.
+###### itype:8: Spesifik untuk mendeteksi ICMP Echo Request, yaitu jenis paket yang digunakan untuk ping.
+###### sid: Snort ID, nomor unik untuk rule ini. Pastikan tidak bentrok dengan rule lain.
+
+## 9. Run Program
+    sudo snort -i enp0s3 -c /etc/snort/snort.conf -l /home/mpi/IDS/slave -A fast icmp
+###### -i enp0s3: Interface yang akan dimonitor.
+###### -c /etc/snort/snort.conf: File konfigurasi Snort yang digunakan.
+###### -l /home/mpi/IDS: Direktori tempat log disimpan.
+###### -A fast: Menampilkan log deteksi dengan format yang sederhana.
+###### icmp: Filter untuk menangkap hanya lalu lintas ICMP.
+
